@@ -1,12 +1,16 @@
 [versions]
-agp = "8.12.3"
-kotlin = "2.0.21"
+agp = "9.4.0"
+kotlin = "2.4.20"
 coreKtx = "1.19.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 appcompat = "1.7.1"
 material = "1.14.0"
+cameraX = "1.4.2"
+mlkitImageLabeling = "17.0.9"
+mlkitObjectDetection = "17.0.2"
+constraintLayout = "2.2.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -15,8 +19,13 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "cameraX" }
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "cameraX" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraX" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraX" }
+mlkit-image-labeling = { group = "com.google.mlkit", name = "image-labeling", version.ref = "mlkitImageLabeling" }
+mlkit-object-detection = { group = "com.google.mlkit", name = "object-detection", version.ref = "mlkitObjectDetection" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintLayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-
