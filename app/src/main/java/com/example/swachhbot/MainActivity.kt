@@ -2,7 +2,6 @@ package com.example.swachhbot
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.RectF
 import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,7 +25,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraPreview: PreviewView
     private lateinit var overlay: DetectionOverlay
     private lateinit var statusText: TextView
+    private lateinit var safetyText: TextView
     private lateinit var cameraExecutor: ExecutorService
+    private val safetyMonitor = CleanerSafetyMonitor()
+    private val recentLabels = ArrayDeque<String>()
 
     private val labeler = ImageLabeling.getClient(
         ImageLabelerOptions.Builder().setConfidenceThreshold(MIN_CONFIDENCE).build()
@@ -49,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         cameraPreview = findViewById(R.id.cameraPreview)
         overlay = findViewById(R.id.detectionOverlay)
         statusText = findViewById(R.id.statusText)
+        safetyText = findViewById(R.id.safetyText)
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         if (hasCameraPermission()) startCamera() else permissionLauncher.launch(Manifest.permission.CAMERA)
@@ -77,8 +80,11 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-        val width = imageProxy.width
-        val height = imageProxy.height
+        // ML Kit returns coordinates in the rotated input image's orientation.
+        val isQuarterTurn = imageProxy.imageInfo.rotationDegrees == 90 ||
+            imageProxy.imageInfo.rotationDegrees == 270
+        val width = if (isQuarterTurn) imageProxy.height else imageProxy.width
+        val height = if (isQuarterTurn) imageProxy.width else imageProxy.height
 
         // Run both lightweight on-device models together: boxes locate obstacles and labels name them.
         val labelsTask = labeler.process(image)
@@ -86,18 +92,40 @@ class MainActivity : AppCompatActivity() {
         com.google.android.gms.tasks.Tasks.whenAllComplete(labelsTask, objectsTask)
             .addOnCompleteListener {
                 val labels = if (labelsTask.isSuccessful) labelsTask.result else emptyList()
-                val boxes = if (objectsTask.isSuccessful) objectsTask.result.map { RectF(it.boundingBox) } else emptyList()
+                val boxes = if (objectsTask.isSuccessful) objectsTask.result.map { it.boundingBox } else emptyList()
                 runOnUiThread {
-                    overlay.setDetections(boxes, width, height)
-                    val bestLabel = labels.maxByOrNull { it.confidence }
+                    val safetyState = safetyMonitor.update(
+                        boxes.map { DetectionBox(it.width(), it.height()) },
+                        width,
+                        height
+                    )
+                    overlay.setDetections(boxes, width, height, safetyState)
+                    safetyText.text = safetyState.message
+                    // Image labeling is frame-wide, so never present it as an object name unless
+                    // the object detector also found an object in this frame.
+                    val bestLabel = if (boxes.isNotEmpty()) {
+                        stableLabel(labels.maxByOrNull { it.confidence }?.text)
+                    } else {
+                        recentLabels.clear()
+                        null
+                    }
                     statusText.text = when {
-                        bestLabel != null -> "I see ${bestLabel.text} (${(bestLabel.confidence * 100).toInt()}%)"
-                        boxes.isNotEmpty() -> "${boxes.size} object${if (boxes.size == 1) "" else "s"} detected"
+                        safetyState == SafetyState.STOP -> "Obstacle detected — stop cleaner"
+                        bestLabel != null -> "I see $bestLabel"
+                        boxes.isNotEmpty() -> "Checking ${boxes.size} object${if (boxes.size == 1) "" else "s"}…"
                         else -> "Scanning for objects…"
                     }
                 }
                 imageProxy.close()
             }
+    }
+
+    /** Only expose a label after it repeats, reducing flicker from single-frame guesses. */
+    private fun stableLabel(label: String?): String? {
+        if (label == null) return null
+        recentLabels.addLast(label)
+        if (recentLabels.size > LABEL_HISTORY_SIZE) recentLabels.removeFirst()
+        return label.takeIf { recentLabels.count { item -> item == label } >= LABEL_CONFIRMATION_COUNT }
     }
 
     private fun hasCameraPermission() =
@@ -116,5 +144,7 @@ class MainActivity : AppCompatActivity() {
 
     private companion object {
         const val MIN_CONFIDENCE = 0.55f
+        const val LABEL_HISTORY_SIZE = 4
+        const val LABEL_CONFIRMATION_COUNT = 3
     }
 }
