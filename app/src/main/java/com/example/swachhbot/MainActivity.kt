@@ -2,6 +2,7 @@ package com.example.swachhbot
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.RectF
 import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -92,10 +93,10 @@ class MainActivity : AppCompatActivity() {
         com.google.android.gms.tasks.Tasks.whenAllComplete(labelsTask, objectsTask)
             .addOnCompleteListener {
                 val labels = if (labelsTask.isSuccessful) labelsTask.result else emptyList()
-                val boxes = if (objectsTask.isSuccessful) objectsTask.result.map { it.boundingBox } else emptyList()
+                val boxes = if (objectsTask.isSuccessful) objectsTask.result.map { RectF(it.boundingBox) } else emptyList()
                 runOnUiThread {
                     val safetyState = safetyMonitor.update(
-                        boxes.map { DetectionBox(it.width(), it.height()) },
+                        boxes.map { DetectionBox(it.width().toInt(), it.height().toInt()) },
                         width,
                         height
                     )
