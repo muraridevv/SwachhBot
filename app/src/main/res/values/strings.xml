@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SwachhBot</string>
+    <string name="camera_permission_rationale">Camera access lets SwachhBot identify objects for the cleaning robot prototype.</string>
+    <string name="camera_permission_required">Camera access is needed to scan the floor.</string>
 </resources>
