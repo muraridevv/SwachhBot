@@ -6,10 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.swachhbot.db.SwachhDatabase
 import com.example.swachhbot.db.entity.*
 import com.example.swachhbot.model.*
+import com.example.swachhbot.network.RobotStateDto
 import com.example.swachhbot.repository.HouseRepository
 import com.example.swachhbot.repository.impl.RoomHouseRepository
 import com.example.swachhbot.simulation.*
+import com.example.swachhbot.network.*
 import com.example.swachhbot.vision.*
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -17,12 +20,15 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
 class SimulatorViewModel(application: Application) : AndroidViewModel(application) {
+    private val client = BackendClient(BackendConfig.BASE_URL)
+    private val gson = Gson()
     private val repository: HouseRepository = RoomHouseRepository(SwachhDatabase.getDatabase(application))
     private val simulator = RobotSimulator(application)
     private val memoryManager = MemoryManager()
     
     val houseMap: HouseMap = DemoMapFactory.createDemoHouse()
     private val houseId = "DEMO_HOUSE_01"
+    private val robotId = "swachhbot-01"
 
     val robotState: StateFlow<RobotState> = simulator.robotState
     val cleaningStats: StateFlow<CleaningStats> = simulator.cleaningStats
@@ -46,6 +52,63 @@ class SimulatorViewModel(application: Application) : AndroidViewModel(applicatio
                 delay(30.seconds)
                 saveHouseKnowledge()
             }
+        }
+
+        // Command Polling Loop (Phase 12+)
+        viewModelScope.launch {
+            while (true) {
+                delay(1.seconds)
+                pollCommands()
+            }
+        }
+
+        // Telemetry Pushing Loop (Phase 12+)
+        viewModelScope.launch {
+            robotState.collect { state ->
+                pushTelemetry(state)
+            }
+        }
+    }
+
+    private suspend fun pollCommands() {
+        val commands = runCatching { client.api.getPendingCommands(robotId) }.getOrNull()
+        commands?.filter { it.status == "PENDING" }?.forEach { cmd ->
+            handleCommand(cmd)
+            client.api.acknowledgeCommand(cmd.id, CommandAckRequest("ACKNOWLEDGED"))
+        }
+    }
+
+    private fun handleCommand(cmd: CommandDto) {
+        when (cmd.command) {
+            "START_CLEANING" -> startCleaning()
+            "STOP" -> stop()
+            "PAUSE" -> pauseCleaning()
+            "MOVE" -> {
+                val payload = gson.fromJson(cmd.payload, MovePayload::class.java)
+                simulator.setMotionCommand(payload.linear, payload.angular, payload.duration)
+            }
+            "START_EXPLORATION" -> {
+                // For simulation, we assume exploration is driven by the backend ExplorationService.
+                // We just acknowledge the command.
+            }
+        }
+    }
+
+    private data class MovePayload(val linear: Double, val angular: Double, val duration: Long)
+
+    private suspend fun pushTelemetry(state: RobotState) {
+        runCatching {
+            client.api.pushRobotState(robotId, RobotStateDto(
+                robotId = robotId,
+                houseId = houseId,
+                x = state.x.toDouble(),
+                y = state.y.toDouble(),
+                rotation = state.rotationDegrees.toDouble(),
+                velocity = state.velocity.toDouble(),
+                battery = state.battery.toDouble(),
+                status = state.status.name
+            )
+            )
         }
     }
 

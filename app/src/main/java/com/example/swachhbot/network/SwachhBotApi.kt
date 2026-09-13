@@ -105,6 +105,14 @@ interface SwachhBotApi {
 
     @POST("api/assistant/actions/{actionId}/reject")
     suspend fun rejectAssistantAction(@Path("actionId") actionId: String): AssistantActionDto
+
+    // ----- Commands (Phase 12+) -----
+
+    @GET("api/commands")
+    suspend fun getPendingCommands(@Query("robotId") robotId: String): List<CommandDto>
+
+    @POST("api/commands/{id}/ack")
+    suspend fun acknowledgeCommand(@Path("id") id: String, @Body request: CommandAckRequest): CommandDto
 }
 
 data class PlanRequest(val houseId: String, val request: String)
@@ -113,3 +121,16 @@ data class PlanResponse(
     val plan: Map<String, Any>? = null,
     val explanation: Map<String, Any>? = null
 )
+
+data class CommandDto(
+    val id: String,
+    val robotId: String,
+    val houseId: String?,
+    val command: String,
+    val status: String,
+    val payload: String?,
+    val issuedAt: String,
+    val ackedAt: String?
+)
+
+data class CommandAckRequest(val status: String)

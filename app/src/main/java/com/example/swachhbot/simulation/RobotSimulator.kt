@@ -36,6 +36,20 @@ class RobotSimulator(private val context: Context) {
     var moveIntent = MoveIntent.NONE
     var turnIntent = TurnIntent.NONE
 
+    // Hardware-independent motion control (Phase 14/16)
+    private var targetLinearVelocity = 0f
+    private var targetAngularVelocity = 0f
+    private var velocityCommandExpiry = 0L
+
+    fun setMotionCommand(linear: Double, angular: Double, durationMs: Long) {
+        this.targetLinearVelocity = linear.toFloat()
+        this.targetAngularVelocity = angular.toFloat()
+        this.velocityCommandExpiry = System.currentTimeMillis() + durationMs
+        // Override intents
+        this.moveIntent = MoveIntent.NONE
+        this.turnIntent = TurnIntent.NONE
+    }
+
     // Physics Configuration
     private val maxSpeed = 300f       // Max pixels per second
     private val acceleration = 400f   // Pixels per second squared
@@ -160,24 +174,33 @@ class RobotSimulator(private val context: Context) {
             }
 
             // 2. Process Rotation
-            when (turnIntent) {
-                TurnIntent.LEFT -> newRot -= rotationSpeed * dt
-                TurnIntent.RIGHT -> newRot += rotationSpeed * dt
-                TurnIntent.NONE -> {}
+            if (System.currentTimeMillis() < velocityCommandExpiry) {
+                newRot += targetAngularVelocity * dt
+            } else {
+                when (turnIntent) {
+                    TurnIntent.LEFT -> newRot -= rotationSpeed * dt
+                    TurnIntent.RIGHT -> newRot += rotationSpeed * dt
+                    TurnIntent.NONE -> {}
+                }
             }
             // Keep rotation within 0-359 degrees for clean telemetry
             newRot = (newRot % 360f).let { if (it < 0) it + 360f else it }
 
             // 3. Process Acceleration and Friction
-            when (moveIntent) {
-                MoveIntent.FORWARD -> newVel += acceleration * dt
-                MoveIntent.BACKWARD -> newVel -= acceleration * dt
-                MoveIntent.NONE -> {
-                    // Apply friction towards 0
-                    if (newVel > 0) {
-                        newVel = (newVel - friction * dt).coerceAtLeast(0f)
-                    } else if (newVel < 0) {
-                        newVel = (newVel + friction * dt).coerceAtMost(0f)
+            if (System.currentTimeMillis() < velocityCommandExpiry) {
+                // Direct velocity control
+                newVel = targetLinearVelocity
+            } else {
+                when (moveIntent) {
+                    MoveIntent.FORWARD -> newVel += acceleration * dt
+                    MoveIntent.BACKWARD -> newVel -= acceleration * dt
+                    MoveIntent.NONE -> {
+                        // Apply friction towards 0
+                        if (newVel > 0) {
+                            newVel = (newVel - friction * dt).coerceAtLeast(0f)
+                        } else if (newVel < 0) {
+                            newVel = (newVel + friction * dt).coerceAtMost(0f)
+                        }
                     }
                 }
             }
