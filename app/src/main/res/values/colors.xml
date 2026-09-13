@@ -7,4 +7,12 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- SwachhBot Robot Theme Colors -->
+    <color name="robot_teal">#142420</color>
+    <color name="robot_mint">#B8FFCF</color>
+    <color name="robot_yellow">#FFD700</color>
+    <color name="robot_red">#FF5252</color>
+    <color name="robot_teal_translucent">#D9142420</color>
+    <color name="robot_teal_dark_translucent">#F20A1210</color>
 </resources>

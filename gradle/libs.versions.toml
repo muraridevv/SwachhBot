@@ -10,6 +10,8 @@ material = "1.14.0"
 cameraX = "1.4.2"
 mlkitImageLabeling = "17.0.9"
 mlkitObjectDetection = "17.0.2"
+arcore = "1.56.0"
+gson = "2.14.0"
 constraintLayout = "2.2.1"
 
 [libraries]
@@ -25,6 +27,8 @@ androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycl
 androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraX" }
 mlkit-image-labeling = { group = "com.google.mlkit", name = "image-labeling", version.ref = "mlkitImageLabeling" }
 mlkit-object-detection = { group = "com.google.mlkit", name = "object-detection", version.ref = "mlkitObjectDetection" }
+arcore = { group = "com.google.ar", name = "core", version.ref = "arcore" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintLayout" }
 
 [plugins]

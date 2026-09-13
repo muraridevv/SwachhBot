@@ -42,6 +42,8 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.mlkit.image.labeling)
     implementation(libs.mlkit.`object`.detection)
+    implementation(libs.arcore)
+    implementation(libs.gson)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
