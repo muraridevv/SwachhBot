@@ -38,7 +38,11 @@ import com.example.swachhbot.vision.ObjectStatus
 import kotlin.math.roundToInt
 
 @Composable
-fun SimulatorScreen(viewModel: SimulatorViewModel = viewModel()) {
+fun SimulatorScreen(
+    onOpenLearning: () -> Unit = {},
+    onOpenAssistant: () -> Unit = {},
+    viewModel: SimulatorViewModel = viewModel()
+) {
     val robotState by viewModel.robotState.collectAsState()
     val cleaningStats by viewModel.cleaningStats.collectAsState()
     val mapVersion by viewModel.mapVersion.collectAsState()
@@ -53,13 +57,26 @@ fun SimulatorScreen(viewModel: SimulatorViewModel = viewModel()) {
             .padding(16.dp)
     ) {
         // Header
-        Text(
-            text = "SWACHHBOT SIMULATOR V2",
-            color = Color(0xFFB8FFCF),
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 2.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "SWACHHBOT",
+                color = Color(0xFFB8FFCF),
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 2.sp,
+                modifier = Modifier.weight(1f)
+            )
+            TextButton(onClick = onOpenAssistant) {
+                Text("🤖 Ask", color = Color(0xFFB8FFCF), fontSize = 12.sp)
+            }
+            TextButton(onClick = onOpenLearning) {
+                Text("🧠 Learned", color = Color(0xFFB8FFCF), fontSize = 12.sp)
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Virtual House / Floor Area
         Box(

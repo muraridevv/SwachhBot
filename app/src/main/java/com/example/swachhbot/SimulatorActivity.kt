@@ -8,7 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import com.example.swachhbot.ui.SimulatorScreen
+import com.example.swachhbot.ui.SwachhBotApp
 
 class SimulatorActivity : ComponentActivity() {
     private val requestPermissionLauncher = registerForActivityResult(
@@ -25,7 +25,7 @@ class SimulatorActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             startApp()
         } else {
@@ -35,7 +35,7 @@ class SimulatorActivity : ComponentActivity() {
 
     private fun startApp() {
         setContent {
-            SimulatorScreen()
+            SwachhBotApp()
         }
     }
 }
