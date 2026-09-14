@@ -2,4 +2,9 @@
     <string name="app_name">SwachhBot</string>
     <string name="camera_permission_rationale">Camera access lets SwachhBot identify objects for the cleaning robot prototype.</string>
     <string name="camera_permission_required">Camera access is needed to scan the floor.</string>
+    <string name="branding_name">SWACHHBOT</string>
+    <string name="status_initializing">System Initializing…</string>
+    <string name="btn_start_clean">START CLEAN</string>
+    <string name="btn_stop_clean">STOP CLEAN</string>
+    <string name="btn_reset_map">RESET MAP</string>
 </resources>

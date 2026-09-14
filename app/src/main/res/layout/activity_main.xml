@@ -3,10 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black">
+    android:background="@color/black">
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/cameraPreview"
+    <!-- Background Camera View -->
+    <android.opengl.GLSurfaceView
+        android:id="@+id/surfaceView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -14,75 +15,129 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- AI Detection Overlay -->
     <com.example.swachhbot.DetectionOverlay
         android:id="@+id/detectionOverlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@id/cameraPreview"
-        app:layout_constraintEnd_toEndOf="@id/cameraPreview"
-        app:layout_constraintStart_toStartOf="@id/cameraPreview"
-        app:layout_constraintTop_toTopOf="@id/cameraPreview" />
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:background="#D9142420"
-        android:orientation="vertical"
-        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Modern Header -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/robot_teal_translucent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="20dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="SWACHHBOT • FLOOR SCAN"
-            android:textColor="#B8FFCF"
-            android:textSize="12sp"
-            android:textStyle="bold" />
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/ic_bot_logo" />
 
-        <TextView
-            android:id="@+id/statusText"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Starting camera…"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.2"
+                android:text="@string/branding_name"
+                android:textColor="@color/robot_mint"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/status_initializing"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/helpText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        android:background="#CC142420"
-        android:paddingHorizontal="14dp"
-        android:paddingVertical="10dp"
-        android:text="Point the camera at floors, obstacles, or litter"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <!-- Mini-Map Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/mapCard"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_margin="16dp"
+        app:cardBackgroundColor="@color/robot_teal_translucent"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header">
 
-    <TextView
-        android:id="@+id/safetyText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="20dp"
-        android:background="#D9142420"
-        android:gravity="center"
-        android:padding="12dp"
-        android:text="PATH CLEAR • SAFE TO MOVE"
-        android:textColor="#B8FFCF"
-        android:textSize="14sp"
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="2dp">
+            <com.example.swachhbot.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Control Buttons -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnClean"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="220dp"
+        android:layout_height="72dp"
+        android:layout_marginBottom="32dp"
+        android:text="@string/btn_start_clean"
+        android:textColor="@color/robot_teal"
+        android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/helpText"
+        app:backgroundTint="@color/robot_mint"
+        app:cornerRadius="36dp"
+        app:icon="@android:drawable/ic_media_play"
+        app:iconGravity="textStart"
+        app:iconSize="24dp"
+        app:iconTint="@color/robot_teal"
+        app:layout_constraintBottom_toTopOf="@id/safetyText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnResetMap"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/btn_reset_map"
+        android:textColor="@color/robot_mint"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/btnClean"
+        app:layout_constraintEnd_toEndOf="@id/btnClean"
+        app:layout_constraintStart_toStartOf="@id/btnClean" />
+
+    <!-- Safety Status Bar -->
+    <TextView
+        android:id="@+id/safetyText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/robot_teal_dark_translucent"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="PATH CLEAR • SAFE TO MOVE"
+        android:textColor="@color/robot_mint"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
