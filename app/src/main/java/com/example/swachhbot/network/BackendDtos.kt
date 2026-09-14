@@ -53,7 +53,8 @@ data class RobotStateDto(
     val rotation: Double,
     val velocity: Double,
     val battery: Double,
-    val status: String
+    val status: String,
+    val isColliding: Boolean
 )
 
 data class SessionDto(
@@ -88,6 +89,7 @@ data class TelemetryMessage(
     val velocity: Double = 0.0,
     val battery: Double = 0.0,
     val status: String? = null,
+    val isColliding: Boolean = false,
     val cleaningPercent: Double? = null,
     val timestamp: String? = null
 )

@@ -14,7 +14,8 @@ data class RobotState(
     val rotationDegrees: Float = 90f, // Start facing East (90 degrees) for Zig-Zag
     val velocity: Float = 0f,
     val battery: Float = 100f,
-    val status: RobotStatus = RobotStatus.IDLE
+    val status: RobotStatus = RobotStatus.IDLE,
+    val isColliding: Boolean = false
 )
 
 data class RoomBounds(

@@ -106,6 +106,14 @@ interface SwachhBotApi {
     @POST("api/assistant/actions/{actionId}/reject")
     suspend fun rejectAssistantAction(@Path("actionId") actionId: String): AssistantActionDto
 
+    // ----- Exploration (Phase 16) -----
+    
+    @POST("api/exploration/start")
+    suspend fun startExploration()
+
+    @POST("api/exploration/stop")
+    suspend fun stopExploration()
+
     // ----- Commands (Phase 12+) -----
 
     @GET("api/commands")

@@ -27,7 +27,7 @@ class SimulatorViewModel(application: Application) : AndroidViewModel(applicatio
     private val memoryManager = MemoryManager()
     
     val houseMap: HouseMap = DemoMapFactory.createDemoHouse()
-    private val houseId = "DEMO_HOUSE_01"
+    private val houseId = HouseIdentity.get(application)
     private val robotId = "swachhbot-01"
 
     val robotState: StateFlow<RobotState> = simulator.robotState
@@ -106,9 +106,9 @@ class SimulatorViewModel(application: Application) : AndroidViewModel(applicatio
                 rotation = state.rotationDegrees.toDouble(),
                 velocity = state.velocity.toDouble(),
                 battery = state.battery.toDouble(),
-                status = state.status.name
-            )
-            )
+                status = state.status.name,
+                isColliding = state.isColliding
+            ))
         }
     }
 
@@ -164,7 +164,15 @@ class SimulatorViewModel(application: Application) : AndroidViewModel(applicatio
     fun setMoveIntent(intent: MoveIntent) = simulator.apply { moveIntent = intent }
     fun setTurnIntent(intent: TurnIntent) = simulator.apply { turnIntent = intent }
     
-    fun startCleaning() = simulator.startCleaning()
+    fun startCleaning() {
+        simulator.startCleaning() // Ensure UI shows it's cleaning
+        viewModelScope.launch {
+            runCatching {
+                client.api.startExploration()
+            }
+        }
+    }
+    
     fun pauseCleaning() = simulator.pauseCleaning()
     
     fun stop() {
@@ -189,6 +197,7 @@ class SimulatorViewModel(application: Application) : AndroidViewModel(applicatio
                 }
             }
         }
+        viewModelScope.launch { runCatching { client.api.stopExploration() } }
         saveHouseKnowledge()
     }
 

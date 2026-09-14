@@ -8,7 +8,8 @@ import java.util.UUID
  *  - Physical device / Raspberry Pi: use the server's LAN address.
  */
 object BackendConfig {
-    const val BASE_URL = "http://10.0.2.2:8080/"
+    // For physical devices, use the host machine's Wi-Fi IP.
+    const val BASE_URL = "http://192.168.0.106:8080/"
 }
 
 /**
@@ -28,9 +29,23 @@ object HouseIdentity {
 
     fun get(context: Context): String {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        prefs.getString(KEY_HOUSE_UUID, null)?.let { return it }
-        val generated = UUID.randomUUID().toString()
-        prefs.edit().putString(KEY_HOUSE_UUID, generated).apply()
-        return generated
+        val current = prefs.getString(KEY_HOUSE_UUID, null)
+        
+        // If it's the old hardcoded ID, or null, or invalid UUID, regenerate.
+        if (current == null || current == LOCAL_HOUSE_ID || !isValidUuid(current)) {
+            val generated = UUID.randomUUID().toString()
+            prefs.edit().putString(KEY_HOUSE_UUID, generated).apply()
+            return generated
+        }
+        return current
+    }
+
+    private fun isValidUuid(str: String): Boolean {
+        return try {
+            UUID.fromString(str)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 }

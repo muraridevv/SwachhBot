@@ -40,11 +40,13 @@ class RobotSimulator(private val context: Context) {
     private var targetLinearVelocity = 0f
     private var targetAngularVelocity = 0f
     private var velocityCommandExpiry = 0L
+    private var isBackendDriven = false
 
     fun setMotionCommand(linear: Double, angular: Double, durationMs: Long) {
         this.targetLinearVelocity = linear.toFloat()
         this.targetAngularVelocity = angular.toFloat()
         this.velocityCommandExpiry = System.currentTimeMillis() + durationMs
+        this.isBackendDriven = true
         // Override intents
         this.moveIntent = MoveIntent.NONE
         this.turnIntent = TurnIntent.NONE
@@ -142,7 +144,7 @@ class RobotSimulator(private val context: Context) {
             }
 
             // 1. Ask Planner for Intents if Cleaning
-            if (currentState.status == RobotStatus.CLEANING) {
+            if (currentState.status == RobotStatus.CLEANING && !isBackendDriven) {
                 val (mIntent, tIntent) = planner.getNextIntents(currentState) { cx, cy ->
                     checkCollision(cx, cy, robotRadius)
                 }
@@ -249,7 +251,8 @@ class RobotSimulator(private val context: Context) {
                 rotationDegrees = newRot,
                 velocity = newVel,
                 battery = newBattery,
-                status = if (newBattery == 0f) RobotStatus.ERROR else newStatus
+                status = if (newBattery == 0f) RobotStatus.ERROR else newStatus,
+                isColliding = checkCollision(propX, propY, robotRadius)
             )
         }
     }
