@@ -1,24 +1,24 @@
 [versions]
 agp = "9.4.0"
-kotlin = "2.2.10"
-coreKtx = "1.13.1"
+kotlin = "2.4.20"
+coreKtx = "1.19.0"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
-appcompat = "1.7.0"
-material = "1.12.0"
-cameraX = "1.3.4"
-mlkitImageLabeling = "17.0.8"
-mlkitObjectDetection = "17.0.1"
-arcore = "1.45.0"
-gson = "2.10.1"
-constraintLayout = "2.1.4"
-composeBom = "2024.04.01"
-activityCompose = "1.9.0"
-lifecycleViewmodelCompose = "2.8.0"
-room = "2.6.1"
-retrofit = "2.11.0"
-okhttp = "4.12.0"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
+appcompat = "1.8.0"
+material = "1.14.0"
+cameraX = "1.6.2"
+mlkitImageLabeling = "17.0.9"
+mlkitObjectDetection = "17.0.2"
+arcore = "1.56.0"
+gson = "2.14.0"
+constraintLayout = "2.2.2"
+composeBom = "2026.09.00"
+activityCompose = "1.13.0"
+lifecycleViewmodelCompose = "2.11.0"
+room = "2.8.5"
+retrofit = "3.0.0"
+okhttp = "5.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -57,4 +57,4 @@ okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor",
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version = "2.3.6" }
+ksp = { id = "com.google.devtools.ksp", version = "2.0.20-1.0.24" }
