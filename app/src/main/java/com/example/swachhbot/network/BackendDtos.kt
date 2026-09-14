@@ -10,6 +10,14 @@ data class HouseDto(
     val id: String? = null,
     val name: String,
     val width: Double,
+    val height: Double,
+    val rooms: List<RoomDto> = emptyList()
+)
+
+data class HouseRequest(
+    val id: String? = null,
+    val name: String,
+    val width: Double,
     val height: Double
 )
 
@@ -28,6 +36,24 @@ data class MapUpdateRequest(
     val gridHeight: Int,
     val cellSize: Double,
     val mapData: String
+)
+
+data class RoomRequest(
+    val id: String? = null,
+    val name: String,
+    val x: Double,
+    val y: Double,
+    val width: Double,
+    val height: Double
+)
+
+data class RoomDto(
+    val id: String,
+    val name: String,
+    val x: Double,
+    val y: Double,
+    val width: Double,
+    val height: Double
 )
 
 data class ObjectDto(

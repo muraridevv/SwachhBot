@@ -19,7 +19,10 @@ interface SwachhBotApi {
     suspend fun getHouse(@Path("id") id: String): HouseDto
 
     @POST("api/houses")
-    suspend fun createHouse(@Body house: HouseDto): HouseDto
+    suspend fun createHouse(@Body house: HouseRequest): HouseDto
+
+    @POST("api/houses/{houseId}/rooms")
+    suspend fun addRoom(@Path("houseId") houseId: String, @Body request: RoomRequest): RoomDto
 
     // ----- Map -----
 

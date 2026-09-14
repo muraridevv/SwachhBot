@@ -119,6 +119,28 @@ class SimulatorViewModel(application: Application) : AndroidViewModel(applicatio
                 repository.saveHouse(HouseEntity(houseId, "Sample House", houseMap.width, houseMap.height))
             }
 
+            // Sync house to backend (Phase 12+)
+            runCatching {
+                client.api.getHouse(houseId)
+            }.onFailure {
+                // If house doesn't exist on backend, create it.
+                runCatching {
+                    client.api.createHouse(HouseRequest(houseId, "Sample House", houseMap.width.toDouble(), houseMap.height.toDouble()))
+                    
+                    // Add rooms specifically to the backend
+                    houseMap.rooms.forEach { room ->
+                        client.api.addRoom(houseId, RoomRequest(
+                            id = room.id,
+                            name = room.name,
+                            x = room.x.toDouble(),
+                            y = room.y.toDouble(),
+                            width = room.width.toDouble(),
+                            height = room.height.toDouble()
+                        ))
+                    }
+                }
+            }
+
             // Load map
             val latestGrid = repository.getLatestGrid(houseId)
             if (latestGrid != null) {

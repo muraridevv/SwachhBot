@@ -5,7 +5,7 @@ import com.example.swachhbot.model.*
 object DemoMapFactory {
     fun createDemoHouse(): HouseMap {
         val livingRoom = Room(
-            id = "R1", name = "Living Room", x = 0f, y = 0f, width = 600f, height = 600f,
+            id = "f47ac10b-58cc-4372-a567-0e02b2c3d479", name = "Living Room", x = 0f, y = 0f, width = 600f, height = 600f,
             furniture = listOf(
                 Furniture("F1", FurnitureType.SOFA, 300f, 100f, 200f, 80f, 0f),
                 Furniture("F2", FurnitureType.TABLE, 300f, 220f, 120f, 60f, 0f),
@@ -14,7 +14,7 @@ object DemoMapFactory {
         )
 
         val kitchen = Room(
-            id = "R2", name = "Kitchen", x = 600f, y = 0f, width = 400f, height = 600f,
+            id = "550e8400-e29b-41d4-a716-446655440000", name = "Kitchen", x = 600f, y = 0f, width = 400f, height = 600f,
             furniture = listOf(
                 Furniture("F4", FurnitureType.REFRIGERATOR, 900f, 100f, 80f, 80f),
                 Furniture("F5", FurnitureType.TABLE, 800f, 350f, 140f, 140f),
@@ -23,14 +23,14 @@ object DemoMapFactory {
         )
 
         val bedroom = Room(
-            id = "R3", name = "Bedroom", x = 0f, y = 600f, width = 600f, height = 400f,
+            id = "6ba7b810-9dad-11d1-80b4-00c04fd430c8", name = "Bedroom", x = 0f, y = 600f, width = 600f, height = 400f,
             furniture = listOf(
                 Furniture("F7", FurnitureType.BED, 150f, 800f, 180f, 220f, 90f)
             )
         )
 
         val bathroom = Room(
-            id = "R4", name = "Bathroom", x = 600f, y = 600f, width = 400f, height = 400f
+            id = "6ba7b811-9dad-11d1-80b4-00c04fd430c8", name = "Bathroom", x = 600f, y = 600f, width = 400f, height = 400f
         )
 
         // Add walls with gaps for "doors"
