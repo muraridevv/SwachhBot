@@ -36,5 +36,6 @@ data class CleaningStats(
 data class CleaningSession(
     val timestamp: Long,
     val durationSeconds: Long,
-    val cleanedPercentage: Float
+    val cleanedPercentage: Float,
+    val roomId: String? = null
 )

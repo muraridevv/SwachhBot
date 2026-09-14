@@ -36,6 +36,7 @@ data class ObjectDto(
     val type: String,
     val category: String,
     val status: String,
+    val roomName: String? = null,
     val x: Double,
     val y: Double,
     val confidence: Double,
@@ -58,6 +59,7 @@ data class RobotStateDto(
 data class SessionDto(
     val id: String? = null,
     val houseId: String? = null,
+    val roomId: String? = null,
     val startedAt: String,
     val endedAt: String? = null,
     val durationSeconds: Long,

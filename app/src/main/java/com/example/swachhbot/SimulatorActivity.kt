@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.example.swachhbot.ui.SwachhBotApp
+import com.example.swachhbot.ui.theme.SwachhBotTheme
 
 class SimulatorActivity : ComponentActivity() {
     private val requestPermissionLauncher = registerForActivityResult(
@@ -35,7 +36,9 @@ class SimulatorActivity : ComponentActivity() {
 
     private fun startApp() {
         setContent {
-            SwachhBotApp()
+            SwachhBotTheme {
+                SwachhBotApp()
+            }
         }
     }
 }

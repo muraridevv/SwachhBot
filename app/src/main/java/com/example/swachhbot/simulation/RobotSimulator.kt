@@ -84,10 +84,16 @@ class RobotSimulator(private val context: Context) {
         
         if (finalStatus == RobotStatus.CLEANING || finalStatus == RobotStatus.PAUSED) {
             val stats = _cleaningStats.value
+            val currentRoomId = houseMap?.rooms?.firstOrNull { 
+                _robotState.value.x >= it.x && _robotState.value.x <= it.x + it.width && 
+                _robotState.value.y >= it.y && _robotState.value.y <= it.y + it.height 
+            }?.id
+
             return CleaningSession(
                 timestamp = System.currentTimeMillis(),
                 durationSeconds = stats.elapsedTimeSeconds,
-                cleanedPercentage = stats.percentageCleaned
+                cleanedPercentage = stats.percentageCleaned,
+                roomId = currentRoomId
             )
         }
         return null

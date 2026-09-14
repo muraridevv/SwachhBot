@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.example.swachhbot.ui.theme.RobotMint
 import com.example.swachhbot.vision.DetectedObject
 import com.example.swachhbot.vision.MLKitDetectionEngine
 import com.example.swachhbot.vision.ObjectDetectionEngine
@@ -79,7 +80,7 @@ fun CameraView(
                 val bottom = rect.bottom * scaleY
 
                 drawRect(
-                    color = androidx.compose.ui.graphics.Color.Green,
+                    color = RobotMint,
                     topLeft = Offset(left, top),
                     size = Size(right - left, bottom - top),
                     style = Stroke(width = 5f)
@@ -88,8 +89,8 @@ fun CameraView(
                 drawContext.canvas.nativeCanvas.apply {
                     val paint = Paint().apply {
                         color = Color.GREEN
-                        textSize = 40f
-                        style = Paint.Style.FILL
+                        textSize = 36f
+                        isFakeBoldText = true
                     }
                     val text = "${obj.type} ${(obj.confidence * 100).toInt()}%"
                     drawText(text, left, top - 10f, paint)

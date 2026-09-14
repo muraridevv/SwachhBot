@@ -139,9 +139,15 @@ class SimulatorViewModel(application: Application) : AndroidViewModel(applicatio
             val gridData = simulator.occupancyMapper.getSerializedData()
             repository.saveOccupancyGrid(OccupancyGridEntity(houseId = houseId, gridData = gridData, timestamp = System.currentTimeMillis()))
 
-            // Save Objects
+            // Save Objects locally
             memoryManager.rememberedObjects.value.forEach { obj ->
                 repository.saveObject(obj.toEntity(houseId))
+            }
+
+            // Sync to backend if available (Phase 18 vision tracking)
+            runCatching {
+                val sync = SyncManager(repository, client, houseId, robotId)
+                sync.pushObjects(houseMap.rooms)
             }
         }
     }
@@ -171,6 +177,16 @@ class SimulatorViewModel(application: Application) : AndroidViewModel(applicatio
                     durationSeconds = session.durationSeconds,
                     cleanedPercentage = session.cleanedPercentage
                 ))
+                // Also push to backend if available (Phase 19 intelligence)
+                runCatching {
+                    val sync = SyncManager(repository, client, houseId, robotId)
+                    sync.pushSession(CleaningSessionEntity(
+                        houseId = houseId,
+                        timestamp = session.timestamp,
+                        durationSeconds = session.durationSeconds,
+                        cleanedPercentage = session.cleanedPercentage
+                    ), session.roomId)
+                }
             }
         }
         saveHouseKnowledge()

@@ -3,6 +3,7 @@ package com.example.swachhbot.network
 import com.example.swachhbot.db.entity.CleaningSessionEntity
 import com.example.swachhbot.db.entity.ObjectEntity
 import com.example.swachhbot.model.CellState
+import com.example.swachhbot.model.Room
 import com.example.swachhbot.repository.HouseRepository
 import com.example.swachhbot.vision.DetectedObject
 import kotlinx.coroutines.Dispatchers
@@ -38,14 +39,18 @@ class SyncManager(
         }
 
     /** Push all locally remembered objects to the backend (idempotent upsert). */
-    suspend fun pushObjects() = withContext(Dispatchers.IO) {
+    suspend fun pushObjects(rooms: List<Room> = emptyList()) = withContext(Dispatchers.IO) {
         repository.getObjects(houseId).first().forEach { entity ->
-            backend.api.upsertObject(houseId, entity.toDto(houseId))
+            val roomName = rooms.firstOrNull { 
+                entity.x >= it.x && entity.x <= it.x + it.width && 
+                entity.y >= it.y && entity.y <= it.y + it.height 
+            }?.name
+            backend.api.upsertObject(houseId, entity.toDto(houseId, roomName))
         }
     }
 
     /** Push a just-finished cleaning session. */
-    suspend fun pushSession(session: CleaningSessionEntity) = withContext(Dispatchers.IO) {
+    suspend fun pushSession(session: CleaningSessionEntity, roomId: String? = null) = withContext(Dispatchers.IO) {
         backend.api.createSession(
             houseId,
             SessionDto(
@@ -53,7 +58,8 @@ class SyncManager(
                 endedAt = Instant.ofEpochMilli(session.timestamp + session.durationSeconds * 1000).toString(),
                 durationSeconds = session.durationSeconds,
                 cleanedPercentage = session.cleanedPercentage.toDouble(),
-                areaCleanedSqm = 0.0
+                areaCleanedSqm = 0.0,
+                roomId = roomId
             )
         )
     }
@@ -97,12 +103,13 @@ class SyncManager(
 
 // ----- Local <-> DTO mappers -----
 
-fun ObjectEntity.toDto(houseId: String) = ObjectDto(
+fun ObjectEntity.toDto(houseId: String, roomName: String? = null) = ObjectDto(
     id = id,
     houseId = houseId,
     type = type,
     category = category,
     status = status,
+    roomName = roomName,
     x = x.toDouble(),
     y = y.toDouble(),
     confidence = confidence.toDouble(),
